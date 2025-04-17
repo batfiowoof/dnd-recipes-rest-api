@@ -1,5 +1,6 @@
 package com.dnd_recipe_api_server.recipes.exceptions;
 
+import com.dnd_recipe_api_server.recipes.enums.IngredientErrors;
 import com.dnd_recipe_api_server.recipes.enums.RecipeErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(errorType.getStatus()));
     }
 
+    @ExceptionHandler(IngredientException.class)
+    public ResponseEntity<ErrorResponse> handleIngredientException(IngredientException ex) {
+        IngredientErrors errorType = ex.getError();
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                errorType.getMessage(),
+                errorType.getStatus()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(errorType.getStatus()));
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {

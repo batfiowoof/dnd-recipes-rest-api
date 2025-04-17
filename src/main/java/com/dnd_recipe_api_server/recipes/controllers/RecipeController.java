@@ -33,10 +33,10 @@ public class RecipeController {
         return ResponseEntity.ok(recipe);
     }
 
-    @GetMapping("/exception")
-    public void testException() {
-        throw new RecipeException(RecipeErrors.RECIPE_NOT_FOUND);
-    }
+//    @GetMapping("/exception")
+//    public void testException() {
+//        throw new RecipeException(RecipeErrors.RECIPE_NOT_FOUND);
+//    }
 
     @PostMapping
     public ResponseEntity<Recipe> createRecipe(@RequestBody Recipe recipe) {
