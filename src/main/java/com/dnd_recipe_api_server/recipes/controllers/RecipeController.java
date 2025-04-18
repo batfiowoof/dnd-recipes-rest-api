@@ -44,9 +44,15 @@ public class RecipeController {
 //    }
 
     @PostMapping
-    public ResponseEntity<Recipe> createRecipe(@RequestBody Recipe recipe) {
+    public ResponseEntity<Recipe> createRecipe(@RequestPart("recipe") Recipe recipe, @RequestPart(value = "file", required = false) MultipartFile file) throws IOException{ {
+        if (file != null && !file.isEmpty()) {
+            String imageUrl = cloudinaryService.uploadImage(file);
+            recipe.setImageUrl(imageUrl);
+        }
+
         Recipe createdRecipe = recipeService.createRecipe(recipe);
         return ResponseEntity.status(201).body(createdRecipe);
+    }
     }
 
     @PutMapping("/{id}")

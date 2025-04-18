@@ -41,7 +41,6 @@ public class IngredientService {
         Ingredient ingredient = ingredientRepository.findById(id)
                 .orElseThrow(() -> new IngredientException(IngredientErrors.INGREDIENT_NOT_FOUND));
         ingredient.setName(updateIngredient.getName());
-        ingredient.setQuantity(updateIngredient.getQuantity());
         return ingredientRepository.save(ingredient);
     }
 

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -25,7 +27,9 @@ public class Recipe {
     private String imageUrl;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
     private Category category;
+
+    @ManyToMany
+    private List<Ingredient> ingredients;
 }
 

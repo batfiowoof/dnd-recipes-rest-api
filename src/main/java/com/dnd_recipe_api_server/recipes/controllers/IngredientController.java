@@ -30,7 +30,7 @@ public class IngredientController {
     }
 
     @PostMapping
-    public ResponseEntity<Ingredient> createIngredient(Ingredient ingredient) {
+    public ResponseEntity<Ingredient> createIngredient(@RequestBody Ingredient ingredient) {
         Ingredient createdIngredient = ingredientService.createIngredient(ingredient);
         return ResponseEntity.status(201).body(createdIngredient);
     }
