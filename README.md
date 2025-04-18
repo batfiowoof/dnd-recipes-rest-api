@@ -18,18 +18,21 @@ Spring Boot REST API за магически рецепти, използван�
 
 ## 🗃️ Структура на проекта
 
-
-.
-├── controllers       # REST контролери
-├── services          # Бизнес логика
-├── repositories      # Spring Data JPA репота
-├── models / entities # Recipe, Category и др.
-├── dtos              # Data Transfer обекти
-├── mappers           # DTO ↔ Entity трансформация
-├── exceptions        # Централизирано error API
-└── resources
-    └── application.properties
-
+```
+src/
+└── main/
+    └── java/
+        └── com/dnd_recipe_api_server/recipes/
+            ├── controllers/        # REST контролери
+            ├── entities/           # JPA ентитети
+            ├── enums/              # Енуми
+            ├── exceptions/         # Обработка на грешки
+            ├── dto/                # Data Transfer обекти
+            ├── mappers/            # DTO - Entity
+            ├── repositories/       # Spring Data JPA репозитории
+            ├── services/           # Сървиси с бизнес логика
+            └── RecipesApplication  # Главен клас
+```
 
 ---
 
@@ -127,5 +130,3 @@ spring.jpa.hibernate.ddl-auto=update
 
 Проект за мобилно приложение – backend част.  
 Изграден с магия, кофеин и малко помощ от ChatGPT.
-
-```
