@@ -68,14 +68,18 @@ mvn spring-boot:run
 - Content-Type: `multipart/form-data`
 - Поле: `file` → избери `.jpg`, `.png`
 
+### ⚙️ При създаването на рецепта има опция с и без изображение.
+
+Съответно има ендпоинтове с CRUD за Ingredients и Categories.
+
 ---
 
 ## 💾 База данни
 
-Проектът използва **H2 в persistent режим** – запазва данните в `./data/dnddb.mv.db`.
+Проектът използва **H2 в persistent режим** – запазва данните в `./data/recipes.mv.db`.
 
 ```properties
-spring.datasource.url=jdbc:h2:file:./data/dnddb
+spring.datasource.url=jdbc:h2:file:./recipes
 spring.jpa.hibernate.ddl-auto=update
 ```
 
@@ -87,12 +91,13 @@ spring.jpa.hibernate.ddl-auto=update
 
 ```json
 {
-  "code": "RECIPE_NOT_FOUND",
   "message": "Recipe not found",
   "status": 404,
   "timestamp": "2025-04-17T15:44:23.741"
 }
 ```
+
+Още exception-и могат да се добавят през Enum-ите.
 
 ---
 
@@ -117,7 +122,12 @@ spring.jpa.hibernate.ddl-auto=update
   "description": "Spicy and cursed.",
   "instructions": "Boil it until it screams.",
   "difficulty": "HARD",
-  "categoryName": "Stew"
+  "category": {
+    "id": 1
+}
+  "ingredients": [
+    { "id": 1}
+]
 }
 ```
 
@@ -129,4 +139,4 @@ spring.jpa.hibernate.ddl-auto=update
 ## 🐉 Автор
 
 Проект за мобилно приложение – backend част.  
-Изграден с магия, кофеин и малко помощ от ChatGPT.
+Изграден с магия, много кофеин и малко помощ от ChatGPT.
