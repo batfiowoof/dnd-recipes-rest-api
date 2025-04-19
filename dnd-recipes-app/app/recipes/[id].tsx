@@ -6,15 +6,18 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from "react-native";
+import { Button } from "react-native-paper";
 import axios from "axios";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const router = useRouter();
 
   useEffect(() => {
     axios
@@ -29,6 +32,32 @@ export default function RecipeDetailScreen() {
       navigation.setOptions({ title: recipe.name });
     }
   }, [recipe?.name]);
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Recipe",
+      "Are you sure you want to DESINTEGRATE this recipe?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Desintegrate Recipe!",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await axios.delete(`http://192.168.0.213:8080/api/recipes/${id}`);
+              router.navigate("/recipes");
+            } catch (err) {
+              console.error("Failed to delete recipe", err);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   if (loading) {
     return (
@@ -76,6 +105,16 @@ export default function RecipeDetailScreen() {
           ))}
         </>
       )}
+
+      <Button
+        mode="contained-tonal"
+        title="Delete Recipe"
+        onPress={handleDelete}
+        style={styles.dangerButton}
+        textColor="red"
+      >
+        Delete Recipe
+      </Button>
     </ScrollView>
   );
 }
@@ -128,5 +167,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "red",
     fontSize: 18,
+  },
+  dangerButton: {
+    backgroundColor: "#f44336",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  dangerButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
