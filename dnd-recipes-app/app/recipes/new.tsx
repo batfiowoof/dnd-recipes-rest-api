@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { TextInput, Button, Text, Menu } from "react-native-paper";
 import axios from "axios";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 
 export default function NewRecipeScreen() {
@@ -29,6 +29,8 @@ export default function NewRecipeScreen() {
   const [difficultyAnchor, setDifficultyAnchor] = useState({ x: 0, y: 0 });
   const [categoryAnchor, setCategoryAnchor] = useState({ x: 0, y: 0 });
 
+  const navigation = useNavigation();
+
   const difficultyButtonRef = useRef(null);
   const categoryButtonRef = useRef(null);
 
@@ -39,6 +41,10 @@ export default function NewRecipeScreen() {
       .get("http://192.168.0.213:8080/api/categories")
       .then((res) => setCategories(res.data))
       .catch((err) => console.error("Failed to fetch categories", err));
+  }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({ title: "Create New Recipe" });
   }, []);
 
   const openMenu = (ref, setAnchor, setVisible) => {
