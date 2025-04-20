@@ -13,6 +13,7 @@ const MAPPING = {
   "house.fill": "home",
   "paperplane.fill": "send",
   "book.fill": "book",
+  "shop.fill": "shop",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
 } as Partial<
