@@ -28,13 +28,13 @@ public class RecipeController {
 
     @GetMapping
     public ResponseEntity<List<Recipe>> getAllRecipes() {
-        List<Recipe> recipes = recipeService.findAll();
+        List<Recipe> recipes = this.recipeService.findAll();
         return ResponseEntity.ok(recipes);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Recipe> getRecipe(@PathVariable int id) {
-        Recipe recipe = recipeService.findById(id);
+        Recipe recipe = this.recipeService.findById(id);
         return ResponseEntity.ok(recipe);
     }
 
@@ -50,20 +50,25 @@ public class RecipeController {
             recipe.setImageUrl(imageUrl);
         }
 
-        Recipe createdRecipe = recipeService.createRecipe(recipe);
+        Recipe createdRecipe = this.recipeService.createRecipe(recipe);
         return ResponseEntity.status(201).body(createdRecipe);
     }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Recipe> updateRecipe(@PathVariable int id, @RequestBody Recipe recipe) {
-        Recipe updatedRecipe = recipeService.updateRecipe(id, recipe);
+    public ResponseEntity<Recipe> updateRecipe(@PathVariable int id, @RequestPart("recipe") Recipe recipe, @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
+        if (file != null && !file.isEmpty()) {
+            String imageUrl = this.cloudinaryService.uploadImage(file);
+            recipe.setImageUrl(imageUrl);
+        }
+
+        Recipe updatedRecipe = this.recipeService.updateRecipe(id, recipe);
         return ResponseEntity.ok(updatedRecipe);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRecipe(@PathVariable int id) {
-        recipeService.deleteRecipe(id);
+        this.recipeService.deleteRecipe(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -74,16 +79,16 @@ public class RecipeController {
         } catch (IllegalArgumentException e) {
             throw new RecipeException(RecipeErrors.INVALID_DIFFICULTY);
         }
-        List<Recipe> recipes = recipeService.findByDifficulty(Difficulty.valueOf(difficulty));
+        List<Recipe> recipes = this.recipeService.findByDifficulty(Difficulty.valueOf(difficulty));
         return ResponseEntity.ok(recipes);
     }
 
     @PostMapping("/{id}/image")
     public ResponseEntity<Recipe> uploadImage(@PathVariable int id, @RequestParam("file") MultipartFile file) throws IOException {
-        Recipe recipe = recipeService.findById(id);
-        String imageUrl = cloudinaryService.uploadImage(file);
+        Recipe recipe = this.recipeService.findById(id);
+        String imageUrl = this.cloudinaryService.uploadImage(file);
         recipe.setImageUrl(imageUrl);
-        Recipe updatedRecipe = recipeService.updateRecipe(id, recipe);
+        Recipe updatedRecipe = this.recipeService.updateRecipe(id, recipe);
         return ResponseEntity.ok(updatedRecipe);
     }
 }

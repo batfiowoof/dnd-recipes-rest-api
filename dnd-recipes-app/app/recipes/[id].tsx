@@ -59,6 +59,10 @@ export default function RecipeDetailScreen() {
     );
   };
 
+  const handleEdit = () => {
+    router.push(`/recipes/${id}/edit`);
+  };
+
   if (loading) {
     return (
       <ActivityIndicator
@@ -107,13 +111,23 @@ export default function RecipeDetailScreen() {
       )}
 
       <Button
+        icon={"trash-can"}
         mode="contained-tonal"
-        title="Delete Recipe"
         onPress={handleDelete}
         style={styles.dangerButton}
         textColor="red"
       >
         Delete Recipe
+      </Button>
+
+      <Button
+        icon={"pencil"}
+        mode="contained"
+        onPress={handleEdit}
+        style={styles.editButton}
+        textColor="white"
+      >
+        Edit Recipe
       </Button>
     </ScrollView>
   );
@@ -170,15 +184,19 @@ const styles = StyleSheet.create({
   },
   dangerButton: {
     backgroundColor: "#f44336",
-    paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 40,
   },
   dangerButtonText: {
     color: "#fff",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  editButton: {
+    backgroundColor: "#1976d2", // синьо – подходящо за „действие“
+    borderRadius: 8,
+    marginTop: 24,
   },
 });

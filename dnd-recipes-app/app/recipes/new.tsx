@@ -34,7 +34,7 @@ export default function NewRecipeScreen() {
   const difficultyButtonRef = useRef(null);
   const categoryButtonRef = useRef(null);
 
-  const difficulties = ["EASY", "MEDIUM", "HARD"];
+  const difficulties = ["EASY", "MEDIUM", "HARD", "LEGENDARY"];
 
   useEffect(() => {
     axios
