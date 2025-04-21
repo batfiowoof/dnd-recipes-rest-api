@@ -83,6 +83,12 @@ public class RecipeController {
         return ResponseEntity.ok(recipes);
     }
 
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<Recipe>> getRecipesByCategory(@PathVariable String category) {
+        List<Recipe> recipes = this.recipeService.findByCategory(category);
+        return ResponseEntity.ok(recipes);
+    }
+
     @PostMapping("/{id}/image")
     public ResponseEntity<Recipe> uploadImage(@PathVariable int id, @RequestParam("file") MultipartFile file) throws IOException {
         Recipe recipe = this.recipeService.findById(id);

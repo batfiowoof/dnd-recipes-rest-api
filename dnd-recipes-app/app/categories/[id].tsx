@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -6,22 +6,35 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { Text, Button, ActivityIndicator } from "react-native-paper";
+import { Text, ActivityIndicator } from "react-native-paper";
+import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
 import axios from "axios";
-import { useRouter } from "expo-router";
 
-export default function HomeScreen() {
+export default function CategoryRecipesScreen() {
+  const { id } = useLocalSearchParams();
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const navigation = useNavigation();
 
   useEffect(() => {
     axios
-      .get("http://192.168.0.213:8080/api/recipes")
+      .get(`http://192.168.0.213:8080/api/recipes/category/${id}`)
       .then((res) => setRecipes(res.data))
       .catch((err) => console.error("Failed to fetch recipes", err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [id]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: `${id} Recipes`,
+      headerBackTitle: "Back",
+      headerStyle: {
+        backgroundColor: "#6200ee",
+      },
+      headerTintColor: "#fff",
+    });
+  }, [navigation]);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -44,50 +57,22 @@ export default function HomeScreen() {
     </TouchableOpacity>
   );
 
+  if (loading) {
+    return <ActivityIndicator style={{ flex: 1, justifyContent: "center" }} />;
+  }
+
   return (
     <View style={styles.container}>
-      <Text variant="displaySmall" style={styles.header}>
-        Welcome to DnD Recipes!
-      </Text>
-      <Text variant="bodyMedium" style={styles.subheader}>
-        Manage your fantasy cooking like a true alchemist.
-      </Text>
-
-      <View style={styles.buttonRow}>
-        <Button
-          mode="contained"
-          onPress={() => router.push("/recipes")}
-          style={styles.button}
-        >
-          Browse Recipes
-        </Button>
-        <Button
-          mode="outlined"
-          onPress={() => router.push("/recipes/new")}
-          style={styles.button}
-        >
-          Add New Recipe
-        </Button>
-      </View>
-
-      <Text variant="titleMedium" style={styles.section}>
-        Recent Recipes
-      </Text>
-
-      {loading ? (
-        <ActivityIndicator />
+      {recipes.length === 0 ? (
+        <Text style={styles.empty}>No recipes in this category.</Text>
       ) : (
         <FlatList
-          data={recipes.slice(0, 3)}
+          data={recipes}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
         />
       )}
-
-      <Text style={styles.quote}>
-        "Cooking is just another kind of spellcasting." — Chef Zoltar
-      </Text>
     </View>
   );
 }
@@ -95,33 +80,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    marginTop: 50,
     backgroundColor: "#fff",
   },
-  header: {
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  subheader: {
-    textAlign: "center",
-    marginBottom: 20,
-    color: "#666",
-  },
-  buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  button: {
-    flex: 1,
-    marginHorizontal: 4,
-  },
-  section: {
-    marginBottom: 12,
-  },
   list: {
-    paddingBottom: 20,
+    padding: 16,
   },
   card: {
     backgroundColor: "#f8f8f8",
@@ -153,10 +115,10 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 4,
   },
-  quote: {
-    marginTop: 24,
+  empty: {
     textAlign: "center",
-    fontStyle: "italic",
-    color: "#777",
+    marginTop: 40,
+    fontSize: 16,
+    color: "#888",
   },
 });

@@ -76,6 +76,7 @@ export default function RecipeListScreen() {
         icon="plus"
         style={styles.fab}
         onPress={() => router.push("/recipes/new")}
+        label="Add Recipe"
       />
     </View>
   );

@@ -14,6 +14,7 @@ const MAPPING = {
   "paperplane.fill": "send",
   "book.fill": "book",
   "shop.fill": "shop",
+  "folder.fill": "folder",
   "chevron.left.forwardslash.chevron.right": "code",
   "chevron.right": "chevron-right",
 } as Partial<

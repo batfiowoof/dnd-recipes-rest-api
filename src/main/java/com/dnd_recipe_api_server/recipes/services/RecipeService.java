@@ -58,4 +58,8 @@ public class RecipeService {
     public List<Recipe> findByDifficulty(Difficulty difficulty) {
         return recipeRepository.findByDifficulty(difficulty);
     }
+
+    public List<Recipe> findByCategory(String category) {
+        return recipeRepository.findByCategoryName(category);
+    }
 }
