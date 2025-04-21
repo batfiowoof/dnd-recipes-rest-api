@@ -3,6 +3,7 @@ import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { Text, Card, ActivityIndicator, FAB } from "react-native-paper";
 import axios from "axios";
 import { useRouter } from "expo-router";
+import { themeStyles } from "@/constants/themeStyles";
 
 export default function IngredientsScreen() {
   const [ingredients, setIngredients] = useState([]);
@@ -19,9 +20,9 @@ export default function IngredientsScreen() {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => router.push(`/ingredients/${item.id}`)}>
-      <Card style={styles.card}>
+      <Card style={[themeStyles.card, styles.card]}>
         <Card.Content>
-          <Text variant="titleMedium">{item.name}</Text>
+          <Text style={themeStyles.title}>{item.name}</Text>
         </Card.Content>
       </Card>
     </TouchableOpacity>
@@ -32,7 +33,7 @@ export default function IngredientsScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={themeStyles.background}>
       <FlatList
         data={ingredients}
         keyExtractor={(item) => item.id.toString()}
@@ -43,18 +44,15 @@ export default function IngredientsScreen() {
       <FAB
         icon="plus"
         label="Add Ingredient"
-        style={{ position: "absolute", bottom: 16, right: 16 }}
+        style={[themeStyles.fab, styles.fab]}
         onPress={() => router.push("/ingredients/new")}
+        color="white"
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
   list: {
     marginTop: 40,
     padding: 16,
@@ -65,5 +63,11 @@ const styles = StyleSheet.create({
   loader: {
     flex: 1,
     justifyContent: "center",
+  },
+  fab: {
+    position: "absolute",
+    right: 16,
+    bottom: 32,
+    zIndex: 99,
   },
 });

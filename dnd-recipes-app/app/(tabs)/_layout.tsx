@@ -14,17 +14,14 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: "#ff4444", // червен цвят за иконата и текста
+        tabBarInactiveTintColor: "#aaa", // цвят за неактивните табове
+        tabBarActiveBackgroundColor: "#1e1e1e", // по желание – фон на активния таб
+        tabBarStyle: {
+          backgroundColor: "#121212",
+          borderTopColor: "#b30000",
+        },
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: "absolute",
-          },
-          default: {},
-        }),
       }}
     >
       <Tabs.Screen
@@ -59,7 +56,7 @@ export default function TabLayout() {
         options={{
           title: "Categories",
           tabBarIcon: ({ color }) => (
-            <EntypoSymbol size={28} name="folder.fill" color={color} />
+            <IconSymbol size={28} name="folder.fill" color={color} />
           ),
         }}
       />

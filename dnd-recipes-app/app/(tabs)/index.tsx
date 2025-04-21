@@ -9,6 +9,7 @@ import {
 import { Text, Button, ActivityIndicator } from "react-native-paper";
 import axios from "axios";
 import { useRouter } from "expo-router";
+import { themeStyles } from "@/constants/themeStyles";
 
 export default function HomeScreen() {
   const [recipes, setRecipes] = useState([]);
@@ -46,18 +47,19 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text variant="displaySmall" style={styles.header}>
-        Welcome to DnD Recipes!
-      </Text>
-      <Text variant="bodyMedium" style={styles.subheader}>
-        Manage your fantasy cooking like a true alchemist.
-      </Text>
+      <View style={styles.headerWrapper}>
+        <Text style={styles.header}>Welcome to DnD Recipes!</Text>
+        <Text style={styles.subheader}>
+          Manage your fantasy cooking like a true alchemist.
+        </Text>
+      </View>
 
       <View style={styles.buttonRow}>
         <Button
           mode="contained"
           onPress={() => router.push("/recipes")}
           style={styles.button}
+          textColor="white"
         >
           Browse Recipes
         </Button>
@@ -65,17 +67,16 @@ export default function HomeScreen() {
           mode="outlined"
           onPress={() => router.push("/recipes/new")}
           style={styles.button}
+          textColor="white"
         >
           Add New Recipe
         </Button>
       </View>
 
-      <Text variant="titleMedium" style={styles.section}>
-        Recent Recipes
-      </Text>
+      <Text style={styles.section}>Recent Recipes</Text>
 
       {loading ? (
-        <ActivityIndicator />
+        <ActivityIndicator color="#b71c1c" />
       ) : (
         <FlatList
           data={recipes.slice(0, 3)}
@@ -96,39 +97,52 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    marginTop: 50,
-    backgroundColor: "#fff",
+    paddingTop: 60,
+    backgroundColor: "#292525",
+  },
+  headerWrapper: {
+    marginBottom: 24,
   },
   header: {
     textAlign: "center",
-    marginBottom: 8,
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
   },
   subheader: {
     textAlign: "center",
-    marginBottom: 20,
-    color: "#666",
+    marginTop: 4,
+    color: "#ccc",
   },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 20,
+    marginBottom: 24,
   },
   button: {
     flex: 1,
     marginHorizontal: 4,
+    borderColor: "#b71c1c",
+    backgroundColor: "#b71c1c",
   },
   section: {
+    color: "#ff5252",
+    fontSize: 18,
+    fontWeight: "600",
     marginBottom: 12,
   },
   list: {
     paddingBottom: 20,
+    borderColor: "#b71c1c",
   },
   card: {
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#1a1a1a",
     padding: 12,
     marginBottom: 12,
     borderRadius: 10,
-    elevation: 2,
+    elevation: 3,
+    borderColor: "#b71c1c",
+    borderWidth: 2,
   },
   row: {
     flexDirection: "row",
@@ -142,21 +156,22 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 8,
-    backgroundColor: "#ddd",
+    backgroundColor: "#333",
   },
   title: {
     fontSize: 18,
     fontWeight: "600",
+    color: "#fff",
   },
   subtitle: {
     fontSize: 14,
-    color: "#555",
+    color: "#ccc",
     marginTop: 4,
   },
   quote: {
     marginTop: 24,
     textAlign: "center",
     fontStyle: "italic",
-    color: "#777",
+    color: "#888",
   },
 });

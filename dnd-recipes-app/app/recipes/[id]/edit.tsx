@@ -11,6 +11,7 @@ import { TextInput, Button, Text, Menu, FAB, Portal } from "react-native-paper";
 import axios from "axios";
 import { useRouter, useLocalSearchParams, useNavigation } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+import { themeStyles } from "@/constants/themeStyles";
 
 export default function EditRecipeScreen() {
   const router = useRouter();
@@ -60,9 +61,12 @@ export default function EditRecipeScreen() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: `Editing ${name}`,
+      title: `Edit`,
+      headerStyle: { backgroundColor: "#121212" },
+      headerTintColor: "#f0e6d2",
+      headerTitleStyle: { fontWeight: "bold" },
     });
-  }, [navigation]);
+  }, [name]);
 
   const openMenu = (ref, setAnchor, setVisible) => {
     const node = findNodeHandle(ref.current);
@@ -126,34 +130,39 @@ export default function EditRecipeScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={themeStyles.background}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text variant="titleLarge">Editing {name}</Text>
+        <Text style={[themeStyles.title, { marginBottom: 16 }]}>
+          Editing {name}
+        </Text>
 
         <TextInput
           label="Name"
+          textColor="white"
           value={name}
           onChangeText={setName}
           mode="outlined"
-          style={styles.input}
+          style={themeStyles.input}
         />
 
         <TextInput
           label="Description"
+          textColor="white"
           value={description}
           onChangeText={setDescription}
           mode="outlined"
           multiline
-          style={styles.input}
+          style={themeStyles.input}
         />
 
         <TextInput
           label="Instructions"
+          textColor="white"
           value={instructions}
           onChangeText={setInstructions}
           mode="outlined"
           multiline
-          style={styles.input}
+          style={themeStyles.input}
         />
 
         <View>
@@ -167,7 +176,8 @@ export default function EditRecipeScreen() {
                 setDifficultyMenuVisible
               )
             }
-            style={styles.input}
+            style={themeStyles.input}
+            textColor="#f0e6d2"
           >
             Difficulty: {difficulty}
           </Button>
@@ -200,7 +210,8 @@ export default function EditRecipeScreen() {
                 setCategoryMenuVisible
               )
             }
-            style={styles.input}
+            style={themeStyles.input}
+            textColor="#f0e6d2"
           >
             Category: {categoryName || "Select"}
           </Button>
@@ -222,14 +233,19 @@ export default function EditRecipeScreen() {
           </Menu>
         </View>
 
-        <Button mode="outlined" onPress={pickImage} style={styles.input}>
+        <Button mode="outlined" onPress={pickImage} style={themeStyles.input}>
           {image ? "Change Image" : "Pick New Image"}
         </Button>
 
         {(image?.uri || existingImageUrl) && (
           <Image
             source={{ uri: image?.uri || existingImageUrl }}
-            style={{ width: "100%", height: 200, borderRadius: 8 }}
+            style={{
+              width: "100%",
+              height: 200,
+              borderRadius: 8,
+              marginTop: 12,
+            }}
           />
         )}
       </ScrollView>
@@ -241,7 +257,8 @@ export default function EditRecipeScreen() {
           onPress={handleSubmit}
           loading={submitting}
           disabled={submitting}
-          style={styles.fab}
+          style={[themeStyles.fab, styles.fab]}
+          color="white"
         />
       </Portal>
     </View>
@@ -254,14 +271,10 @@ const styles = StyleSheet.create({
     gap: 16,
     paddingBottom: 100,
   },
-  input: {
-    backgroundColor: "white",
-    marginBottom: 12,
-  },
   fab: {
     position: "absolute",
     right: 16,
     bottom: 16,
-    backgroundColor: "#1976d2",
+    zIndex: 99,
   },
 });

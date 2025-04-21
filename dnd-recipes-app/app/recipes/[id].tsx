@@ -6,11 +6,11 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
-  Alert,
 } from "react-native";
-import { Button } from "react-native-paper";
+import { Button, Dialog, Portal, Paragraph } from "react-native-paper";
 import axios from "axios";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { themeStyles } from "@/constants/themeStyles";
 
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -18,6 +18,7 @@ export default function RecipeDetailScreen() {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const router = useRouter();
+  const [dialogVisible, setDialogVisible] = useState(false);
 
   useEffect(() => {
     axios
@@ -29,34 +30,28 @@ export default function RecipeDetailScreen() {
 
   useLayoutEffect(() => {
     if (recipe?.name) {
-      navigation.setOptions({ title: recipe.name });
+      navigation.setOptions({
+        title: recipe.name,
+        headerStyle: {
+          backgroundColor: "#121212",
+        },
+        headerTintColor: "#f0e6d2",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+      });
     }
   }, [recipe?.name]);
 
-  const handleDelete = () => {
-    Alert.alert(
-      "Delete Recipe",
-      "Are you sure you want to DESINTEGRATE this recipe?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Desintegrate Recipe!",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await axios.delete(`http://192.168.0.213:8080/api/recipes/${id}`);
-              router.navigate("/recipes");
-            } catch (err) {
-              console.error("Failed to delete recipe", err);
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+  const handleDeleteConfirm = async () => {
+    try {
+      await axios.delete(`http://192.168.0.213:8080/api/recipes/${id}`);
+      router.navigate("/recipes");
+    } catch (err) {
+      console.error("Failed to delete recipe", err);
+    } finally {
+      setDialogVisible(false);
+    }
   };
 
   const handleEdit = () => {
@@ -77,59 +72,97 @@ export default function RecipeDetailScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{recipe.name}</Text>
+    <View style={themeStyles.background}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={[themeStyles.title, { marginBottom: 20 }]}>
+          {recipe.name}
+        </Text>
 
-      <View style={styles.infoRow}>
-        <Text style={styles.tag}>Difficulty: {recipe.difficulty}</Text>
-        <Text style={styles.tag}>Category: {recipe.category?.name}</Text>
-      </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.tag}>Difficulty: {recipe.difficulty}</Text>
+          <Text
+            style={styles.tag}
+            onPress={() => router.push(`/categories/${recipe.category?.name}`)}
+          >
+            Category: {recipe.category?.name}
+          </Text>
+        </View>
 
-      {recipe.imageUrl && (
-        <Image
-          source={{ uri: recipe.imageUrl }}
-          resizeMode="cover"
-          style={styles.image}
-        />
-      )}
+        {recipe.imageUrl && (
+          <Image
+            source={{ uri: recipe.imageUrl }}
+            resizeMode="cover"
+            style={styles.image}
+          />
+        )}
 
-      <Text style={styles.section}>Description</Text>
-      <Text style={styles.text}>{recipe.description}</Text>
+        <Text style={themeStyles.subtitle}>Description</Text>
+        <Text style={themeStyles.text}>{recipe.description}</Text>
 
-      <Text style={styles.section}>Instructions</Text>
-      <Text style={styles.text}>{recipe.instructions}</Text>
+        <Text style={themeStyles.subtitle}>Instructions</Text>
+        <Text style={themeStyles.text}>{recipe.instructions}</Text>
 
-      {recipe.ingredients && recipe.ingredients.length > 0 && (
-        <>
-          <Text style={styles.section}>Ingredients</Text>
-          {recipe.ingredients.map((ing) => (
-            <Text key={ing.id} style={styles.ingredient}>
-              • {ing.name}
-            </Text>
-          ))}
-        </>
-      )}
+        {recipe.ingredients && recipe.ingredients.length > 0 && (
+          <>
+            <Text style={themeStyles.subtitle}>Ingredients</Text>
+            {recipe.ingredients.map((ing) => (
+              <Text key={ing.id} style={themeStyles.text}>
+                • {ing.name}
+              </Text>
+            ))}
+          </>
+        )}
 
-      <Button
-        icon={"trash-can"}
-        mode="contained-tonal"
-        onPress={handleDelete}
-        style={styles.dangerButton}
-        textColor="red"
-      >
-        Delete Recipe
-      </Button>
+        <Button
+          icon={"trash-can"}
+          mode="contained"
+          onPress={() => setDialogVisible(true)}
+          style={[themeStyles.button, { marginTop: 40 }]}
+          textColor="white"
+        >
+          Delete Recipe
+        </Button>
 
-      <Button
-        icon={"pencil"}
-        mode="contained"
-        onPress={handleEdit}
-        style={styles.editButton}
-        textColor="white"
-      >
-        Edit Recipe
-      </Button>
-    </ScrollView>
+        <Button
+          icon={"pencil"}
+          mode="contained"
+          onPress={handleEdit}
+          style={[
+            themeStyles.button,
+            { marginTop: 16, backgroundColor: "#6200ee" },
+          ]}
+          textColor="white"
+        >
+          Edit Recipe
+        </Button>
+
+        <Portal>
+          <Dialog
+            visible={dialogVisible}
+            onDismiss={() => setDialogVisible(false)}
+            style={themeStyles.card}
+          >
+            <Dialog.Title style={themeStyles.title}>
+              Desintegrate Recipe
+            </Dialog.Title>
+            <Dialog.Content>
+              <Paragraph style={themeStyles.text}>
+                Are you sure you want to permanently remove this arcane
+                creation?
+              </Paragraph>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={() => setDialogVisible(false)} textColor="#aaa">
+                Cancel
+              </Button>
+              <Button onPress={handleDeleteConfirm} textColor="#EE4B2B">
+                Desintegrate!
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -143,60 +176,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 16,
   },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
   infoRow: {
     flexDirection: "row",
     gap: 16,
-    marginBottom: 8,
+    marginBottom: 12,
+    justifyContent: "center",
   },
   tag: {
-    backgroundColor: "#eee",
+    backgroundColor: "#400000",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
     fontSize: 14,
-    color: "#444",
-  },
-  section: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginTop: 20,
-    marginBottom: 4,
-  },
-  text: {
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  ingredient: {
-    fontSize: 15,
-    marginLeft: 8,
-    marginTop: 4,
+    color: "#fef4e8",
   },
   error: {
     marginTop: 100,
     textAlign: "center",
     color: "red",
     fontSize: 18,
-  },
-  dangerButton: {
-    backgroundColor: "#f44336",
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 40,
-  },
-  dangerButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  editButton: {
-    backgroundColor: "#1976d2", // синьо – подходящо за „действие“
-    borderRadius: 8,
-    marginTop: 24,
   },
 });

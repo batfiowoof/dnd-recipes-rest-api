@@ -1,8 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
-import { ActivityIndicator, Card, FAB } from "react-native-paper";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+import { Text, ActivityIndicator, Card, FAB } from "react-native-paper";
 import axios from "axios";
 import { useRouter } from "expo-router";
+import { themeStyles } from "@/constants/themeStyles";
+
+const numColumns = 2;
+const screenWidth = Dimensions.get("window").width;
+const cardMargin = 12;
+const cardWidth = (screenWidth - cardMargin * (numColumns + 1)) / numColumns;
 
 export default function CategoriesScreen() {
   const [categories, setCategories] = useState([]);
@@ -22,8 +34,16 @@ export default function CategoriesScreen() {
       onPress={() => router.push(`/categories/${item.name}`)}
       style={styles.cardWrapper}
     >
-      <Card style={styles.card}>
-        <Card.Title title={item.name} titleStyle={styles.title} />
+      <Card style={[themeStyles.card, styles.card]}>
+        <Card.Content>
+          <Text
+            style={themeStyles.title}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {item.name}
+          </Text>
+        </Card.Content>
       </Card>
     </TouchableOpacity>
   );
@@ -33,19 +53,21 @@ export default function CategoriesScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={themeStyles.background}>
       <FlatList
         data={categories}
-        keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
-        contentContainerStyle={styles.list}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={numColumns}
+        contentContainerStyle={styles.container}
       />
 
       <FAB
         icon="plus"
-        style={{ position: "absolute", bottom: 16, right: 16 }}
+        style={[themeStyles.fab, styles.fab]}
         onPress={() => router.push("/categories/new")}
         label="Add Category"
+        color="white"
       />
     </View>
   );
@@ -53,22 +75,25 @@ export default function CategoriesScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
+    padding: cardMargin,
     marginTop: 40,
   },
-  list: {
-    padding: 16,
-  },
   cardWrapper: {
-    marginBottom: 12,
+    margin: cardMargin / 2,
+    width: cardWidth,
   },
   card: {
-    elevation: 2,
-    borderRadius: 10,
+    height: 100,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  fab: {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
+    zIndex: 99,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "500",
+    textAlign: "center",
   },
 });

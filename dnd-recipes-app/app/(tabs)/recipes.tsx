@@ -11,6 +11,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import axios from "axios";
 import { FAB } from "react-native-paper";
 import { useRouter } from "expo-router";
+import { themeStyles } from "@/constants/themeStyles";
 
 export default function RecipeListScreen() {
   const [refreshing, setRefreshing] = useState(false);
@@ -40,15 +41,13 @@ export default function RecipeListScreen() {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.card}
+      style={styles.itemWrapper}
       onPress={() => router.push(`/recipes/${item.id}`)}
     >
-      <View style={styles.row}>
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{item.name}</Text>
-          <Text style={styles.subtitle}>Difficulty: {item.difficulty}</Text>
-          <Text style={styles.subtitle}>Category: {item.category?.name}</Text>
-        </View>
+      <View style={themeStyles.card}>
+        <Text style={themeStyles.title}>{item.name}</Text>
+        <Text style={themeStyles.subtitle}>Difficulty: {item.difficulty}</Text>
+        <Text style={themeStyles.text}>Category: {item.category?.name}</Text>
 
         {item.imageUrl && (
           <Image
@@ -62,7 +61,7 @@ export default function RecipeListScreen() {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={themeStyles.background}>
       <FlatList
         data={recipes}
         keyExtractor={(item) => item.id.toString()}
@@ -74,9 +73,10 @@ export default function RecipeListScreen() {
 
       <FAB
         icon="plus"
-        style={styles.fab}
+        style={[themeStyles.fab, styles.fab]}
         onPress={() => router.push("/recipes/new")}
         label="Add Recipe"
+        color="#fff"
       />
     </View>
   );
@@ -88,40 +88,20 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
     marginTop: 40,
   },
-  card: {
-    backgroundColor: "#f8f8f8",
-    padding: 12,
-    marginBottom: 12,
-    borderRadius: 10,
-    elevation: 2,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  textContainer: {
-    flex: 1,
-    paddingRight: 8,
+  itemWrapper: {
+    marginBottom: 16,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: "100%",
+    height: 160,
     borderRadius: 8,
-    backgroundColor: "#ddd",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#555",
-    marginTop: 4,
+    backgroundColor: "#000",
+    marginTop: 12,
   },
   fab: {
     position: "absolute",
-    margin: 16,
-    right: 0,
-    bottom: 0,
+    right: 16,
+    bottom: 32,
+    zIndex: 99,
   },
 });
