@@ -1,22 +1,13 @@
 import { Tabs } from "expo-router";
-import React from "react";
-import { Platform } from "react-native";
-
-import { HapticTab } from "@/components/HapticTab";
-import { EntypoSymbol, IconSymbol } from "@/components/ui/IconSymbol";
-import TabBarBackground from "@/components/ui/TabBarBackground";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { Ionicons, Entypo } from "@expo/vector-icons";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#ff4444", // червен цвят за иконата и текста
-        tabBarInactiveTintColor: "#aaa", // цвят за неактивните табове
-        tabBarActiveBackgroundColor: "#1e1e1e", // по желание – фон на активния таб
+        tabBarActiveTintColor: "#ff4444",
+        tabBarInactiveTintColor: "#aaa",
+        tabBarActiveBackgroundColor: "#1e1e1e",
         tabBarStyle: {
           backgroundColor: "#121212",
           borderTopColor: "#b30000",
@@ -28,8 +19,8 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
@@ -37,8 +28,8 @@ export default function TabLayout() {
         name="ingredients"
         options={{
           title: "Ingredients",
-          tabBarIcon: ({ color }) => (
-            <EntypoSymbol size={28} name="shop.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Entypo name="shop" size={size} color={color} />
           ),
         }}
       />
@@ -46,8 +37,8 @@ export default function TabLayout() {
         name="recipes"
         options={{
           title: "Recipes",
-          tabBarIcon: ({ color }) => (
-            <EntypoSymbol size={28} name="book.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Entypo name="book" size={size} color={color} />
           ),
         }}
       />
@@ -55,8 +46,8 @@ export default function TabLayout() {
         name="categories"
         options={{
           title: "Categories",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="folder.fill" color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="folder" size={size} color={color} />
           ),
         }}
       />
