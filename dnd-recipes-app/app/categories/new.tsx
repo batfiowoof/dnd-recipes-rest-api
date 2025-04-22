@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { TextInput, Button, Text, Snackbar } from "react-native-paper";
 import axios from "axios";
 import { useNavigation, useRouter } from "expo-router";
+import { themeStyles } from "@/constants/themeStyles";
 
 export default function NewCategoryScreen() {
   const [name, setName] = useState("");
@@ -30,34 +31,42 @@ export default function NewCategoryScreen() {
       headerTitle: "Create Category",
       headerBackTitle: "Back",
       headerStyle: {
-        backgroundColor: "#6200ee",
+        backgroundColor: "#121212",
       },
-      headerTintColor: "#fff",
+      headerTintColor: "#f0e6d2",
+      headerTitleStyle: {
+        fontWeight: "bold",
+      },
     });
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
-      <Text variant="titleLarge" style={styles.title}>
-        Create Category
-      </Text>
+    <View style={themeStyles.background}>
+      <View style={styles.form}>
+        <Text variant="titleLarge" style={[themeStyles.title, styles.title]}>
+          Create Category
+        </Text>
 
-      <TextInput
-        label="Category Name"
-        value={name}
-        onChangeText={setName}
-        mode="outlined"
-        style={styles.input}
-      />
+        <TextInput
+          label="Category Name"
+          value={name}
+          onChangeText={setName}
+          mode="outlined"
+          style={themeStyles.input}
+          textColor="white"
+        />
 
-      <Button
-        mode="contained"
-        onPress={handleSubmit}
-        loading={loading}
-        disabled={loading || !name.trim()}
-      >
-        Submit
-      </Button>
+        <Button
+          mode="contained"
+          onPress={handleSubmit}
+          loading={loading}
+          disabled={loading || !name.trim()}
+          style={[themeStyles.button, { marginTop: 16 }]}
+          textColor="white"
+        >
+          Submit
+        </Button>
+      </View>
 
       <Snackbar
         visible={snackbarVisible}
@@ -71,16 +80,11 @@ export default function NewCategoryScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  form: {
     padding: 20,
-    backgroundColor: "#fff",
   },
   title: {
     marginBottom: 16,
     textAlign: "center",
-  },
-  input: {
-    marginBottom: 16,
   },
 });

@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { TextInput, Button, Text, Snackbar } from "react-native-paper";
 import axios from "axios";
 import { useNavigation, useRouter } from "expo-router";
+import { themeStyles } from "@/constants/themeStyles";
 
 export default function NewIngredientScreen() {
   const [name, setName] = useState("");
@@ -16,8 +17,8 @@ export default function NewIngredientScreen() {
     navigation.setOptions({
       headerTitle: "New Ingredient",
       headerBackTitle: "Back",
-      headerStyle: { backgroundColor: "#6200ee" },
-      headerTintColor: "#fff",
+      headerStyle: { backgroundColor: "#121212" },
+      headerTintColor: "#f0e6d2",
     });
   }, [navigation]);
 
@@ -37,16 +38,26 @@ export default function NewIngredientScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={themeStyles.background}>
       <ScrollView contentContainerStyle={styles.form}>
-        <Text variant="titleLarge">What did you slay?</Text>
+        <Text variant="titleLarge" style={themeStyles.title}>
+          What did you slay?
+        </Text>
 
         <TextInput
           label="Name"
           value={name}
           onChangeText={setName}
           mode="outlined"
-          style={styles.input}
+          style={themeStyles.input}
+          theme={{
+            colors: {
+              primary: "#b30000",
+              text: "#f0e6d2",
+              placeholder: "#999",
+              background: "#1e1e1e",
+            },
+          }}
         />
 
         <Button
@@ -54,6 +65,8 @@ export default function NewIngredientScreen() {
           onPress={handleSubmit}
           loading={loading}
           disabled={!name.trim() || loading}
+          style={themeStyles.button}
+          textColor="white"
         >
           Save
         </Button>
@@ -71,15 +84,8 @@ export default function NewIngredientScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
   form: {
     padding: 20,
     gap: 16,
-  },
-  input: {
-    backgroundColor: "white",
   },
 });

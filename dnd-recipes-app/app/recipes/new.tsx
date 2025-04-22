@@ -5,6 +5,7 @@ import {
   ScrollView,
   UIManager,
   findNodeHandle,
+  Image,
 } from "react-native";
 import {
   TextInput,
@@ -19,7 +20,7 @@ import {
 import axios from "axios";
 import { useRouter, useNavigation } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import { Image } from "react-native";
+import { themeStyles } from "@/constants/themeStyles";
 
 export default function NewRecipeScreen() {
   const router = useRouter();
@@ -135,24 +136,26 @@ export default function NewRecipeScreen() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: "New Ingredient",
+      headerTitle: "New Recipe",
       headerBackTitle: "Back",
-      headerStyle: { backgroundColor: "#6200ee" },
-      headerTintColor: "#fff",
+      headerStyle: { backgroundColor: "#121212" },
+      headerTintColor: "#f0e6d2",
     });
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
+    <View style={themeStyles.background}>
       <ScrollView contentContainerStyle={styles.form}>
-        <Text variant="titleLarge">What are we cooking?</Text>
+        <Text variant="titleLarge" style={themeStyles.title}>
+          What are we cooking?
+        </Text>
 
         <TextInput
           label="Name"
           value={name}
           onChangeText={setName}
           mode="outlined"
-          style={styles.input}
+          style={themeStyles.input}
         />
 
         <TextInput
@@ -161,7 +164,7 @@ export default function NewRecipeScreen() {
           onChangeText={setDescription}
           mode="outlined"
           multiline
-          style={styles.input}
+          style={themeStyles.input}
         />
 
         <TextInput
@@ -170,12 +173,10 @@ export default function NewRecipeScreen() {
           onChangeText={setInstructions}
           mode="outlined"
           multiline
-          style={styles.input}
+          style={themeStyles.input}
         />
 
-        <Text variant="titleMedium" style={styles.section}>
-          Difficulty
-        </Text>
+        <Text style={themeStyles.subtitle}>Difficulty</Text>
         <Button
           mode="outlined"
           ref={difficultyButtonRef}
@@ -186,7 +187,7 @@ export default function NewRecipeScreen() {
               setDifficultyMenuVisible
             )
           }
-          style={styles.input}
+          style={themeStyles.input}
         >
           {difficulty}
         </Button>
@@ -207,9 +208,7 @@ export default function NewRecipeScreen() {
           ))}
         </Menu>
 
-        <Text variant="titleMedium" style={styles.section}>
-          Category
-        </Text>
+        <Text style={themeStyles.subtitle}>Category</Text>
         <Button
           mode="outlined"
           ref={categoryButtonRef}
@@ -220,7 +219,7 @@ export default function NewRecipeScreen() {
               setCategoryMenuVisible
             )
           }
-          style={styles.input}
+          style={themeStyles.input}
         >
           {categoryId ? `Category ID: ${categoryId}` : "Select Category"}
         </Button>
@@ -241,9 +240,7 @@ export default function NewRecipeScreen() {
           ))}
         </Menu>
 
-        <Text variant="titleMedium" style={styles.section}>
-          Ingredients
-        </Text>
+        <Text style={themeStyles.subtitle}>Ingredients</Text>
         <Button
           mode="outlined"
           ref={ingredientsButtonRef}
@@ -254,7 +251,7 @@ export default function NewRecipeScreen() {
               setIngredientsMenuVisible
             )
           }
-          style={styles.input}
+          style={themeStyles.input}
         >
           {selectedIngredientIds.length > 0
             ? `${selectedIngredientIds.length} selected`
@@ -278,14 +275,14 @@ export default function NewRecipeScreen() {
                         : "unchecked"
                     }
                   />
-                  <Text>{ing.name}</Text>
+                  <Text style={themeStyles.text}>{ing.name}</Text>
                 </View>
               }
             />
           ))}
         </Menu>
 
-        <Button mode="outlined" onPress={pickImage} style={styles.input}>
+        <Button mode="outlined" onPress={pickImage} style={themeStyles.input}>
           {image ? "Change Image" : "Pick Image"}
         </Button>
 
@@ -301,7 +298,7 @@ export default function NewRecipeScreen() {
         <FAB
           icon="check"
           label="Submit"
-          style={{ position: "absolute", bottom: 16, right: 16 }}
+          style={[themeStyles.fab, styles.fab]}
           onPress={handleSubmit}
           loading={submitting}
         />
@@ -319,16 +316,15 @@ export default function NewRecipeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
   form: {
     padding: 20,
     gap: 16,
+    paddingBottom: 100,
   },
-  input: {
-    backgroundColor: "white",
+  fab: {
+    position: "absolute",
+    bottom: 16,
+    right: 16,
   },
   menuItemRow: {
     flexDirection: "row",

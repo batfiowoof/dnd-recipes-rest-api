@@ -9,6 +9,7 @@ import {
 import { Text, ActivityIndicator } from "react-native-paper";
 import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
 import axios from "axios";
+import { themeStyles } from "@/constants/themeStyles";
 
 export default function CategoryRecipesScreen() {
   const { id } = useLocalSearchParams();
@@ -30,21 +31,26 @@ export default function CategoryRecipesScreen() {
       headerTitle: `${id} Recipes`,
       headerBackTitle: "Back",
       headerStyle: {
-        backgroundColor: "#6200ee",
+        backgroundColor: "#121212",
       },
-      headerTintColor: "#fff",
+      headerTintColor: "#f0e6d2",
+      headerTitleStyle: {
+        fontWeight: "bold",
+      },
     });
   }, [navigation]);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.card}
+      style={themeStyles.card}
       onPress={() => router.push(`/recipes/${item.id}`)}
     >
       <View style={styles.row}>
         <View style={styles.textContainer}>
-          <Text style={styles.title}>{item.name}</Text>
-          <Text style={styles.subtitle}>Difficulty: {item.difficulty}</Text>
+          <Text style={themeStyles.title}>{item.name}</Text>
+          <Text style={themeStyles.subtitle}>
+            Difficulty: {item.difficulty}
+          </Text>
         </View>
         {item.imageUrl && (
           <Image
@@ -62,7 +68,7 @@ export default function CategoryRecipesScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={themeStyles.background}>
       {recipes.length === 0 ? (
         <Text style={styles.empty}>No recipes in this category.</Text>
       ) : (
@@ -78,19 +84,8 @@ export default function CategoryRecipesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
   list: {
     padding: 16,
-  },
-  card: {
-    backgroundColor: "#f8f8f8",
-    padding: 12,
-    marginBottom: 12,
-    borderRadius: 10,
-    elevation: 2,
   },
   row: {
     flexDirection: "row",
@@ -104,21 +99,12 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 8,
-    backgroundColor: "#ddd",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#555",
-    marginTop: 4,
+    backgroundColor: "#333",
   },
   empty: {
     textAlign: "center",
     marginTop: 40,
     fontSize: 16,
-    color: "#888",
+    color: "#aaa",
   },
 });
