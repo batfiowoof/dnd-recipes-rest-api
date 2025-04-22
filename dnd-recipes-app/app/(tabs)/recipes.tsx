@@ -8,25 +8,20 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import axios from "axios";
 import { FAB } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { themeStyles } from "@/constants/themeStyles";
+import { useRecipeStore } from "@/store/recipeStore";
 
 export default function RecipeListScreen() {
   const [refreshing, setRefreshing] = useState(false);
-  const [recipes, setRecipes] = useState([]);
   const router = useRouter();
 
-  const fetchRecipes = async () => {
-    try {
-      const response = await axios.get("http://192.168.0.213:8080/api/recipes");
-      setRecipes(response.data);
-    } catch (error) {
-      console.error("Error fetching recipes", error);
-    }
-  };
+  // Само извличаме нужните данни от store
+  const recipes = useRecipeStore((state) => state.recipes);
+  const fetchRecipes = useRecipeStore((state) => state.fetchRecipes);
 
+  // Същата логика като в оригиналния компонент
   useFocusEffect(
     useCallback(() => {
       fetchRecipes();

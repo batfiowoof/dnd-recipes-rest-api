@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,24 +8,24 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Button, Dialog, Portal, Paragraph } from "react-native-paper";
-import axios from "axios";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { themeStyles } from "@/constants/themeStyles";
+import { useRecipeStore } from "@/store/recipeStore";
 
 export default function RecipeDetailScreen() {
   const { id } = useLocalSearchParams();
-  const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [dialogVisible, setDialogVisible] = useState(false);
   const navigation = useNavigation();
   const router = useRouter();
-  const [dialogVisible, setDialogVisible] = useState(false);
+
+  // Използваме Zustand
+  const recipe = useRecipeStore((state) => state.recipe);
+  const loading = useRecipeStore((state) => state.loading);
+  const fetchRecipe = useRecipeStore((state) => state.fetchRecipe);
+  const deleteRecipe = useRecipeStore((state) => state.deleteRecipe);
 
   useEffect(() => {
-    axios
-      .get(`http://192.168.0.213:8080/api/recipes/${id}`)
-      .then((res) => setRecipe(res.data))
-      .catch((err) => console.error("Error loading recipe", err))
-      .finally(() => setLoading(false));
+    fetchRecipe(id);
   }, [id]);
 
   useLayoutEffect(() => {
@@ -44,14 +44,11 @@ export default function RecipeDetailScreen() {
   }, [recipe?.name]);
 
   const handleDeleteConfirm = async () => {
-    try {
-      await axios.delete(`http://192.168.0.213:8080/api/recipes/${id}`);
+    const success = await deleteRecipe(id);
+    if (success) {
       router.navigate("/recipes");
-    } catch (err) {
-      console.error("Failed to delete recipe", err);
-    } finally {
-      setDialogVisible(false);
     }
+    setDialogVisible(false);
   };
 
   const handleEdit = () => {

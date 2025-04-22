@@ -1,146 +1,35 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  UIManager,
-  findNodeHandle,
-  Image,
-} from "react-native";
+import React, { useLayoutEffect } from "react";
+import { View, StyleSheet, ScrollView, Image } from "react-native";
 import { TextInput, Button, Text, Menu, FAB, Portal } from "react-native-paper";
-import axios from "axios";
-import { useRouter, useLocalSearchParams, useNavigation } from "expo-router";
-import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "expo-router";
 import { themeStyles } from "@/constants/themeStyles";
+import { useEditRecipeForm } from "@/hooks/useEditRecipeForm";
 
 export default function EditRecipeScreen() {
-  const router = useRouter();
-  const { id } = useLocalSearchParams();
-
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [instructions, setInstructions] = useState("");
-  const [difficulty, setDifficulty] = useState("EASY");
-  const [categoryName, setCategoryName] = useState("");
-  const [categories, setCategories] = useState([]);
-  const [image, setImage] = useState(null);
-  const [existingImageUrl, setExistingImageUrl] = useState("");
-
-  const [submitting, setSubmitting] = useState(false);
-  const [difficultyMenuVisible, setDifficultyMenuVisible] = useState(false);
-  const [categoryMenuVisible, setCategoryMenuVisible] = useState(false);
-  const [difficultyAnchor, setDifficultyAnchor] = useState({ x: 0, y: 0 });
-  const [categoryAnchor, setCategoryAnchor] = useState({ x: 0, y: 0 });
-
   const navigation = useNavigation();
-
-  const difficultyButtonRef = useRef(null);
-  const categoryButtonRef = useRef(null);
-
-  const difficulties = ["EASY", "MEDIUM", "HARD", "LEGENDARY"];
-
-  useEffect(() => {
-    axios
-      .get(`http://192.168.0.213:8080/api/recipes/${id}`)
-      .then((res) => {
-        const r = res.data;
-        setName(r.name);
-        setDescription(r.description);
-        setInstructions(r.instructions);
-        setDifficulty(r.difficulty);
-        setCategoryName(r.category?.name);
-        setExistingImageUrl(r.imageUrl);
-      })
-      .catch((err) => console.error("Failed to fetch recipe", err));
-
-    axios
-      .get("http://192.168.0.213:8080/api/categories")
-      .then((res) => setCategories(res.data))
-      .catch((err) => console.error("Failed to fetch categories", err));
-  }, [id]);
+  const form = useEditRecipeForm();
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: `Edit`,
+      title: "Edit",
       headerStyle: { backgroundColor: "#121212" },
       headerTintColor: "#f0e6d2",
       headerTitleStyle: { fontWeight: "bold" },
     });
-  }, [name]);
-
-  const openMenu = (ref, setAnchor, setVisible) => {
-    const node = findNodeHandle(ref.current);
-    if (node) {
-      UIManager.measure(node, (x, y, width, height, pageX, pageY) => {
-        setAnchor({ x: pageX + width - 150, y: pageY + height });
-        setVisible(true);
-      });
-    }
-  };
-
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.7,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0]);
-    }
-  };
-
-  const handleSubmit = async () => {
-    setSubmitting(true);
-    try {
-      const formData = new FormData();
-
-      formData.append("recipe", {
-        string: JSON.stringify({
-          name,
-          description,
-          instructions,
-          difficulty,
-          categoryName,
-        }),
-        type: "application/json",
-        name: "recipe.json",
-      });
-
-      if (image) {
-        formData.append("file", {
-          uri: image.uri,
-          type: "image/jpeg",
-          name: "recipe.jpg",
-        });
-      }
-
-      await axios.put(`http://192.168.0.213:8080/api/recipes/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      router.replace("/(tabs)/recipes");
-    } catch (error) {
-      console.error("Failed to update recipe", error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  }, [form.name]);
 
   return (
     <View style={themeStyles.background}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={[themeStyles.title, { marginBottom: 16 }]}>
-          Editing {name}
+          Editing {form.name}
         </Text>
 
         <TextInput
           label="Name"
           textColor="white"
-          value={name}
-          onChangeText={setName}
+          value={form.name}
+          onChangeText={form.setName}
           mode="outlined"
           style={themeStyles.input}
         />
@@ -148,8 +37,8 @@ export default function EditRecipeScreen() {
         <TextInput
           label="Description"
           textColor="white"
-          value={description}
-          onChangeText={setDescription}
+          value={form.description}
+          onChangeText={form.setDescription}
           mode="outlined"
           multiline
           style={themeStyles.input}
@@ -158,94 +47,89 @@ export default function EditRecipeScreen() {
         <TextInput
           label="Instructions"
           textColor="white"
-          value={instructions}
-          onChangeText={setInstructions}
+          value={form.instructions}
+          onChangeText={form.setInstructions}
           mode="outlined"
           multiline
           style={themeStyles.input}
         />
 
-        <View>
-          <Button
-            mode="outlined"
-            ref={difficultyButtonRef}
-            onPress={() =>
-              openMenu(
-                difficultyButtonRef,
-                setDifficultyAnchor,
-                setDifficultyMenuVisible
-              )
-            }
-            style={themeStyles.input}
-            textColor="#f0e6d2"
-          >
-            Difficulty: {difficulty}
-          </Button>
-          <Menu
-            visible={difficultyMenuVisible}
-            onDismiss={() => setDifficultyMenuVisible(false)}
-            anchor={difficultyAnchor}
-          >
-            {difficulties.map((level) => (
-              <Menu.Item
-                key={level}
-                onPress={() => {
-                  setDifficulty(level);
-                  setDifficultyMenuVisible(false);
-                }}
-                title={level}
-              />
-            ))}
-          </Menu>
-        </View>
+        <Button
+          mode="outlined"
+          ref={form.difficultyButtonRef}
+          onPress={() =>
+            form.openMenu(
+              form.difficultyButtonRef,
+              form.setDifficultyAnchor,
+              form.setDifficultyMenuVisible
+            )
+          }
+          style={themeStyles.input}
+          textColor="#f0e6d2"
+        >
+          Difficulty: {form.difficulty}
+        </Button>
+        <Menu
+          visible={form.difficultyMenuVisible}
+          onDismiss={() => form.setDifficultyMenuVisible(false)}
+          anchor={form.difficultyAnchor}
+        >
+          {form.difficulties.map((level) => (
+            <Menu.Item
+              key={level}
+              onPress={() => {
+                form.setDifficulty(level);
+                form.setDifficultyMenuVisible(false);
+              }}
+              title={level}
+            />
+          ))}
+        </Menu>
 
-        <View>
-          <Button
-            mode="outlined"
-            ref={categoryButtonRef}
-            onPress={() =>
-              openMenu(
-                categoryButtonRef,
-                setCategoryAnchor,
-                setCategoryMenuVisible
-              )
-            }
-            style={themeStyles.input}
-            textColor="#f0e6d2"
-          >
-            Category: {categoryName || "Select"}
-          </Button>
-          <Menu
-            visible={categoryMenuVisible}
-            onDismiss={() => setCategoryMenuVisible(false)}
-            anchor={categoryAnchor}
-          >
-            {categories.map((cat) => (
-              <Menu.Item
-                key={cat.id}
-                onPress={() => {
-                  setCategoryName(cat.name);
-                  setCategoryMenuVisible(false);
-                }}
-                title={cat.name}
-              />
-            ))}
-          </Menu>
-        </View>
+        <Button
+          mode="outlined"
+          ref={form.categoryButtonRef}
+          onPress={() =>
+            form.openMenu(
+              form.categoryButtonRef,
+              form.setCategoryAnchor,
+              form.setCategoryMenuVisible
+            )
+          }
+          style={themeStyles.input}
+          textColor="#f0e6d2"
+        >
+          Category: {form.categoryName || "Select"}
+        </Button>
+        <Menu
+          visible={form.categoryMenuVisible}
+          onDismiss={() => form.setCategoryMenuVisible(false)}
+          anchor={form.categoryAnchor}
+        >
+          {form.categories.map((cat) => (
+            <Menu.Item
+              key={cat.id}
+              onPress={() => {
+                form.setCategoryName(cat.name);
+                form.setCategoryMenuVisible(false);
+              }}
+              title={cat.name}
+            />
+          ))}
+        </Menu>
 
-        <Button mode="outlined" onPress={pickImage} style={themeStyles.input}>
-          {image ? "Change Image" : "Pick New Image"}
+        <Button
+          mode="outlined"
+          onPress={form.pickImage}
+          style={themeStyles.input}
+        >
+          {form.image ? "Change Image" : "Pick New Image"}
         </Button>
 
-        {(image?.uri || existingImageUrl) && (
+        {(form.image?.uri || form.existingImageUrl) && (
           <Image
-            source={{ uri: image?.uri || existingImageUrl }}
-            style={{
-              width: "100%",
-              height: 200,
-              borderRadius: 8,
-              marginTop: 12,
-            }}
+            source={{ uri: form.image?.uri || form.existingImageUrl }}
+            style={styles.image}
           />
         )}
       </ScrollView>
@@ -254,9 +138,9 @@ export default function EditRecipeScreen() {
         <FAB
           icon="check"
           label="Save"
-          onPress={handleSubmit}
-          loading={submitting}
-          disabled={submitting}
+          onPress={form.handleSubmit}
+          loading={form.submitting}
+          disabled={form.submitting}
           style={[themeStyles.fab, styles.fab]}
           color="white"
         />
@@ -270,6 +154,12 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 16,
     paddingBottom: 100,
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    borderRadius: 8,
+    marginTop: 12,
   },
   fab: {
     position: "absolute",
