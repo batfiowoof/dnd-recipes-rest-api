@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { FAB } from "@/components/ui/FAB";
 import { Image } from "@/components/ui/Image";
 import { ThemedText } from "@/components/ThemedText";
-import type { Recipe } from "@/store/recipeStore";
+import type { Recipe } from "@/constants/schemas";
 
 export default function RecipeListScreen() {
   const [refreshing, setRefreshing] = useState(false);
@@ -59,7 +59,7 @@ export default function RecipeListScreen() {
 
       <FAB
         icon="plus"
-        label="Add Recipe"
+        label="Add New Recipe"
         onPress={() => router.push("/recipes/new")}
       />
     </View>

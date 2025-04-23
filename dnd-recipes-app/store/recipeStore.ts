@@ -17,13 +17,11 @@ interface RecipeStore {
 }
 
 export const useRecipeStore = create<RecipeStore>((set) => ({
-  // Състояние
   recipes: [],
   recipe: null,
   loading: false,
   error: null,
 
-  // Действия
   setRecipes: (recipes) => set({ recipes }),
 
   fetchRecipes: async () => {

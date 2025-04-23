@@ -4,26 +4,34 @@ export const categorySchema = z.object({
   id: z.number(),
   name: z
     .string()
-    .min(1, "Името е задължително")
-    .max(50, "Името трябва да е по-кратко от 50 символа"),
+    .min(1, "Name is required, adventurer!")
+    .max(50, "Name must be shorter than 50 characters, lest it be too mighty!"),
 });
 
 export const ingredientSchema = z.object({
   id: z.number(),
-  name: z.string().min(1, "Името на съставката е задължително"),
+  name: z
+    .string()
+    .min(1, "The ingredient's name is required, brave alchemist!"),
 });
 
 export const recipeSchema = z.object({
   id: z.number(),
   name: z
     .string()
-    .min(1, "Името е задължително")
-    .max(100, "Името трябва да е по-кратко от 100 символа"),
-  difficulty: z.string().min(1, "Трудността е задължителна"),
+    .min(1, "Name is required, master chef!")
+    .max(
+      100,
+      "Name must be shorter than 100 characters, lest it be too legendary!"
+    ),
+  difficulty: z.string().min(1, "Difficulty is required, mighty warrior!"),
   category: categorySchema.optional(),
-  imageUrl: z.string().url("Невалиден URL адрес").optional(),
+  imageUrl: z.string().url("Invalid URL, traveler!").optional(),
   ingredients: z.array(ingredientSchema).optional(),
-  instructions: z.string().min(1, "Инструкциите са задължителни").optional(),
+  instructions: z
+    .string()
+    .min(1, "Instructions are required, wise sage!")
+    .optional(),
 });
 
 export type Category = z.infer<typeof categorySchema>;

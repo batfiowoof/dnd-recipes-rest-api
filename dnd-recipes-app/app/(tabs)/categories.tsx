@@ -1,69 +1,62 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Dimensions } from "react-native";
+import React, { useState, useCallback } from "react";
+import { View, FlatList, StyleSheet } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { themeStyles } from "@/constants/themeStyles";
+import { useCategoryStore } from "@/store/categoryStore";
 import { Card } from "@/components/ui/Card";
 import { FAB } from "@/components/ui/FAB";
 import { Loading } from "@/components/ui/Loading";
 import { ThemedText } from "@/components/ThemedText";
-import axios from "axios";
+import type { Category } from "@/constants/schemas";
 
-const numColumns = 2;
-const screenWidth = Dimensions.get("window").width;
-const cardMargin = 12;
-const cardWidth = (screenWidth - cardMargin * (numColumns + 1)) / numColumns;
-
-interface Category {
-  id: number;
-  name: string;
-}
-
-export default function CategoriesScreen() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function CategoryListScreen() {
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    axios
-      .get("http://192.168.0.213:8080/api/categories")
-      .then((res) => setCategories(res.data))
-      .catch((err) => console.error("Failed to fetch categories", err))
-      .finally(() => setLoading(false));
-  }, []);
+  const categories = useCategoryStore((state) => state.categories);
+  const loading = useCategoryStore((state) => state.loading);
+  const fetchCategories = useCategoryStore((state) => state.fetchCategories);
 
-  const renderItem = ({ item }: { item: Category }) => (
-    <Card
-      onPress={() => router.push(`/categories/${item.name}`)}
-      style={[styles.cardWrapper, { width: cardWidth }]}
-      contentStyle={styles.cardContent}
-    >
-      <ThemedText
-        style={[themeStyles.title, styles.title]}
-        numberOfLines={2}
-        ellipsizeMode="tail"
-      >
-        {item.name}
-      </ThemedText>
-    </Card>
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+    }, [])
   );
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchCategories();
+    setRefreshing(false);
+  };
 
   if (loading) {
     return <Loading />;
   }
 
+  const renderItem = ({ item }: { item: Category }) => (
+    <Card
+      onPress={() => router.push(`/categories/${item.id}`)}
+      style={styles.itemWrapper}
+    >
+      <ThemedText style={themeStyles.title}>{item.name}</ThemedText>
+    </Card>
+  );
+
   return (
     <View style={themeStyles.background}>
       <FlatList
         data={categories}
-        renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        numColumns={numColumns}
         contentContainerStyle={styles.container}
+        renderItem={renderItem}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
 
       <FAB
         icon="plus"
-        label="Add Category"
+        label="Add New Category"
         onPress={() => router.push("/categories/new")}
       />
     </View>
@@ -72,18 +65,11 @@ export default function CategoriesScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: cardMargin,
+    padding: 16,
+    paddingBottom: 100,
     marginTop: 40,
   },
-  cardWrapper: {
-    margin: cardMargin / 2,
-  },
-  cardContent: {
-    height: 100,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    textAlign: "center",
+  itemWrapper: {
+    marginBottom: 16,
   },
 });

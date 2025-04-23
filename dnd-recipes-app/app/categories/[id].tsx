@@ -1,110 +1,130 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  FlatList,
-  Image,
-  TouchableOpacity,
-} from "react-native";
-import { Text, ActivityIndicator } from "react-native-paper";
-import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
-import axios from "axios";
-import { themeStyles } from "@/constants/themeStyles";
+import React, { useEffect } from "react";
+import { StyleSheet, View, FlatList } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Card } from "@/components/ui/Card";
+import { Image } from "@/components/ui/Image";
+import { Loading } from "@/components/ui/Loading";
+import { ThemedText } from "@/components/ThemedText";
+import { useCategoryStore } from "@/store/categoryStore";
+import { useRecipeStore } from "@/store/recipeStore";
+import type { Recipe } from "@/constants/schemas";
 
-export default function CategoryRecipesScreen() {
+export default function CategoryDetailsScreen() {
   const { id } = useLocalSearchParams();
-  const [recipes, setRecipes] = useState([]);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const navigation = useNavigation();
+  const categoryId = Number(id);
+
+  const {
+    category,
+    loading: categoryLoading,
+    fetchCategory,
+  } = useCategoryStore();
+  const { recipes, loading: recipesLoading, fetchRecipes } = useRecipeStore();
 
   useEffect(() => {
-    axios
-      .get(`http://192.168.0.213:8080/api/recipes/category/${id}`)
-      .then((res) => setRecipes(res.data))
-      .catch((err) => console.error("Failed to fetch recipes", err))
-      .finally(() => setLoading(false));
-  }, [id]);
+    fetchCategory(categoryId);
+    fetchRecipes();
+  }, [categoryId]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: `${id} Recipes`,
-      headerBackTitle: "Back",
-      headerStyle: {
-        backgroundColor: "#121212",
-      },
-      headerTintColor: "#f0e6d2",
-      headerTitleStyle: {
-        fontWeight: "bold",
-      },
-    });
-  }, [navigation]);
-
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={themeStyles.card}
-      onPress={() => router.push(`/recipes/${item.id}`)}
-    >
-      <View style={styles.row}>
-        <View style={styles.textContainer}>
-          <Text style={themeStyles.title}>{item.name}</Text>
-          <Text style={themeStyles.subtitle}>
-            Difficulty: {item.difficulty}
-          </Text>
-        </View>
-        {item.imageUrl && (
-          <Image
-            source={{ uri: item.imageUrl }}
-            style={styles.image}
-            resizeMode="cover"
-          />
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-
-  if (loading) {
-    return <ActivityIndicator style={{ flex: 1, justifyContent: "center" }} />;
+  if (categoryLoading || recipesLoading) {
+    return <Loading />;
   }
 
+  if (!category) {
+    return (
+      <View style={styles.container}>
+        <ThemedText style={styles.error}>
+          The category was not found in our mystical archives, traveler!
+        </ThemedText>
+      </View>
+    );
+  }
+
+  const recipesInCategory = recipes.filter(
+    (recipe) => recipe.category?.id === categoryId
+  );
+
+  const renderRecipe = ({ item }: { item: Recipe }) => (
+    <Card
+      onPress={() => router.push(`/recipes/${item.id}`)}
+      style={styles.recipeCard}
+    >
+      {item.imageUrl && <Image uri={item.imageUrl} style={styles.image} />}
+      <View style={styles.content}>
+        <ThemedText style={styles.title}>{item.name}</ThemedText>
+        <ThemedText style={styles.difficulty}>
+          Difficulty: {item.difficulty}
+        </ThemedText>
+      </View>
+    </Card>
+  );
+
   return (
-    <View style={themeStyles.background}>
-      {recipes.length === 0 ? (
-        <Text style={styles.empty}>No recipes in this category.</Text>
-      ) : (
-        <FlatList
-          data={recipes}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={styles.list}
-        />
-      )}
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <ThemedText style={styles.categoryName}>{category.name}</ThemedText>
+        <ThemedText style={styles.recipeCount}>
+          {recipesInCategory.length}{" "}
+          {recipesInCategory.length === 1 ? "recipe" : "recipes"} found in this
+          category, brave adventurer!
+        </ThemedText>
+      </View>
+
+      <FlatList
+        data={recipesInCategory}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderRecipe}
+        contentContainerStyle={styles.list}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  categoryName: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  recipeCount: {
+    fontSize: 16,
+    opacity: 0.7,
+  },
   list: {
     padding: 16,
   },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  textContainer: {
-    flex: 1,
-    paddingRight: 8,
+  recipeCard: {
+    marginBottom: 16,
   },
   image: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
-    backgroundColor: "#333",
+    width: "100%",
+    height: 200,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
   },
-  empty: {
+  content: {
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  difficulty: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
+  error: {
+    color: "red",
     textAlign: "center",
-    marginTop: 40,
-    fontSize: 16,
-    color: "#aaa",
+    margin: 16,
   },
 });
