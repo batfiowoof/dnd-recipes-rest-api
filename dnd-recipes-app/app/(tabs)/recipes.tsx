@@ -1,27 +1,22 @@
 import React, { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, FlatList, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { FAB } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { themeStyles } from "@/constants/themeStyles";
 import { useRecipeStore } from "@/store/recipeStore";
+import { Card } from "@/components/ui/Card";
+import { FAB } from "@/components/ui/FAB";
+import { Image } from "@/components/ui/Image";
+import { ThemedText } from "@/components/ThemedText";
+import type { Recipe } from "@/store/recipeStore";
 
 export default function RecipeListScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
 
-  // Само извличаме нужните данни от store
   const recipes = useRecipeStore((state) => state.recipes);
   const fetchRecipes = useRecipeStore((state) => state.fetchRecipes);
 
-  // Същата логика като в оригиналния компонент
   useFocusEffect(
     useCallback(() => {
       fetchRecipes();
@@ -34,25 +29,21 @@ export default function RecipeListScreen() {
     setRefreshing(false);
   };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.itemWrapper}
+  const renderItem = ({ item }: { item: Recipe }) => (
+    <Card
       onPress={() => router.push(`/recipes/${item.id}`)}
+      style={styles.itemWrapper}
     >
-      <View style={themeStyles.card}>
-        <Text style={themeStyles.title}>{item.name}</Text>
-        <Text style={themeStyles.subtitle}>Difficulty: {item.difficulty}</Text>
-        <Text style={themeStyles.text}>Category: {item.category?.name}</Text>
+      <ThemedText style={themeStyles.title}>{item.name}</ThemedText>
+      <ThemedText style={themeStyles.subtitle}>
+        Difficulty: {item.difficulty}
+      </ThemedText>
+      <ThemedText style={themeStyles.text}>
+        Category: {item.category?.name}
+      </ThemedText>
 
-        {item.imageUrl && (
-          <Image
-            source={{ uri: item.imageUrl }}
-            resizeMode="cover"
-            style={styles.image}
-          />
-        )}
-      </View>
-    </TouchableOpacity>
+      {item.imageUrl && <Image uri={item.imageUrl} />}
+    </Card>
   );
 
   return (
@@ -68,10 +59,8 @@ export default function RecipeListScreen() {
 
       <FAB
         icon="plus"
-        style={[themeStyles.fab, styles.fab]}
-        onPress={() => router.push("/recipes/new")}
         label="Add Recipe"
-        color="#fff"
+        onPress={() => router.push("/recipes/new")}
       />
     </View>
   );
@@ -85,18 +74,5 @@ const styles = StyleSheet.create({
   },
   itemWrapper: {
     marginBottom: 16,
-  },
-  image: {
-    width: "100%",
-    height: 160,
-    borderRadius: 8,
-    backgroundColor: "#000",
-    marginTop: 12,
-  },
-  fab: {
-    position: "absolute",
-    right: 16,
-    bottom: 32,
-    zIndex: 99,
   },
 });
