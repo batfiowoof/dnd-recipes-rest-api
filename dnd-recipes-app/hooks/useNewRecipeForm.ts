@@ -3,25 +3,33 @@ import { useEffect, useRef, useState } from "react";
 import { UIManager, findNodeHandle } from "react-native";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
+import { RecipeDTO, Category, Ingredient } from "@/types/recipe";
 
 export function useNewRecipeForm(router: any) {
   // state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [instructions, setInstructions] = useState("");
-  const [difficulty, setDifficulty] = useState("EASY");
+  const [difficulty, setDifficulty] = useState<RecipeDTO["difficulty"]>("EASY");
   const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [categories, setCategories] = useState([]);
-  const [ingredients, setIngredients] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [selectedIngredientIds, setSelectedIngredientIds] = useState<number[]>(
     []
   );
   const [image, setImage] = useState<any>(null);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // difficulties
-  const difficulties = ["EASY", "MEDIUM", "HARD", "LEGENDARY"];
+  const difficulties: RecipeDTO["difficulty"][] = [
+    "EASY",
+    "MEDIUM",
+    "HARD",
+    "LEGENDARY",
+  ];
 
   // menu states
   const [difficultyMenuVisible, setDifficultyMenuVisible] = useState(false);
@@ -39,12 +47,12 @@ export function useNewRecipeForm(router: any) {
 
   useEffect(() => {
     axios
-      .get("http://192.168.0.213:8080/api/categories")
+      .get<Category[]>("http://192.168.0.213:8080/api/categories")
       .then((res) => setCategories(res.data))
       .catch(console.error);
 
     axios
-      .get("http://192.168.0.213:8080/api/ingredients")
+      .get<Ingredient[]>("http://192.168.0.213:8080/api/ingredients")
       .then((res) => setIngredients(res.data))
       .catch(console.error);
   }, []);
@@ -97,7 +105,7 @@ export function useNewRecipeForm(router: any) {
     }
   };
 
-  const selectDifficulty = (level: string) => {
+  const selectDifficulty = (level: RecipeDTO["difficulty"]) => {
     setDifficulty(level);
     setDifficultyMenuVisible(false);
   };
@@ -109,22 +117,17 @@ export function useNewRecipeForm(router: any) {
 
   const handleSubmit = async () => {
     setSubmitting(true);
+    setErrors({});
     try {
-      const recipe = {
+      const recipeDTO: RecipeDTO = {
         name,
         description,
         instructions,
         difficulty,
-        category: categoryId ? { id: categoryId } : null,
-        ingredients: selectedIngredientIds.map((id) => ({ id })),
       };
 
       const formData = new FormData();
-      formData.append("recipe", {
-        string: JSON.stringify(recipe),
-        type: "application/json",
-        name: "recipe.json",
-      } as any);
+      formData.append("recipe", JSON.stringify(recipeDTO));
 
       if (image) {
         formData.append("file", {
@@ -138,10 +141,23 @@ export function useNewRecipeForm(router: any) {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
+      setSnackbarMessage("Recipe created successfully!");
       setSnackbarVisible(true);
       setTimeout(() => router.replace("/(tabs)/recipes"), 1500);
-    } catch (err) {
-      console.error("Failed to create recipe", err);
+    } catch (err: any) {
+      if (err.response?.data) {
+        if (typeof err.response.data === "object") {
+          setErrors(err.response.data);
+          setSnackbarMessage("Please fix the validation errors");
+        } else {
+          setSnackbarMessage(
+            err.response.data.error || "Failed to create recipe"
+          );
+        }
+      } else {
+        setSnackbarMessage("An unexpected error occurred");
+      }
+      setSnackbarVisible(true);
     } finally {
       setSubmitting(false);
     }
@@ -159,8 +175,10 @@ export function useNewRecipeForm(router: any) {
     selectedIngredientIds,
     image,
     snackbarVisible,
+    snackbarMessage,
     submitting,
     difficulties,
+    errors,
 
     // refs
     difficultyButtonRef,

@@ -42,7 +42,11 @@ export default function NewRecipeScreen() {
           onChangeText={form.setName}
           mode="outlined"
           style={themeStyles.input}
+          error={!!form.errors.name}
         />
+        {form.errors.name && (
+          <Text style={styles.errorText}>{form.errors.name}</Text>
+        )}
 
         <TextInput
           label="Description"
@@ -52,7 +56,11 @@ export default function NewRecipeScreen() {
           mode="outlined"
           multiline
           style={themeStyles.input}
+          error={!!form.errors.description}
         />
+        {form.errors.description && (
+          <Text style={styles.errorText}>{form.errors.description}</Text>
+        )}
 
         <TextInput
           label="Instructions"
@@ -62,7 +70,11 @@ export default function NewRecipeScreen() {
           mode="outlined"
           multiline
           style={themeStyles.input}
+          error={!!form.errors.instructions}
         />
+        {form.errors.instructions && (
+          <Text style={styles.errorText}>{form.errors.instructions}</Text>
+        )}
 
         <Text style={themeStyles.subtitle}>Difficulty</Text>
         <Button
@@ -73,6 +85,9 @@ export default function NewRecipeScreen() {
         >
           {form.difficulty}
         </Button>
+        {form.errors.difficulty && (
+          <Text style={styles.errorText}>{form.errors.difficulty}</Text>
+        )}
         <Menu
           visible={form.difficultyMenuVisible}
           onDismiss={() => form.setDifficultyMenuVisible(false)}
@@ -182,7 +197,7 @@ export default function NewRecipeScreen() {
         onDismiss={() => form.setSnackbarVisible(false)}
         duration={1500}
       >
-        Recipe created!
+        {form.snackbarMessage}
       </Snackbar>
     </View>
   );
@@ -203,5 +218,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+  },
+  errorText: {
+    color: "#ff4444",
+    fontSize: 12,
+    marginTop: -8,
+    marginBottom: 8,
   },
 });
