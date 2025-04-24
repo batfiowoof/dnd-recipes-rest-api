@@ -10,6 +10,7 @@ import { Text, Button, ActivityIndicator } from "react-native-paper";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { themeStyles } from "@/constants/themeStyles";
+import { API_BASE_URL } from "@/constants/config";
 
 export default function HomeScreen() {
   const [recipes, setRecipes] = useState([]);
@@ -18,7 +19,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     axios
-      .get("http://192.168.0.213:8080/api/recipes")
+      .get(`${API_BASE_URL}/recipes`)
       .then((res) => setRecipes(res.data))
       .catch((err) => console.error("Failed to fetch recipes", err))
       .finally(() => setLoading(false));

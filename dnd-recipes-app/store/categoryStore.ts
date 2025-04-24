@@ -1,8 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { Category, categorySchema } from "@/constants/schemas";
-
-const API_BASE_URL = "http://192.168.0.213:8080/api";
+import { API_BASE_URL } from "@/constants/config";
 
 interface CategoryStore {
   categories: Category[];

@@ -2,8 +2,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { Recipe, recipeSchema } from "@/constants/schemas";
-
-const API_BASE_URL = "http://192.168.0.213:8080/api";
+import { API_BASE_URL } from "@/constants/config";
 
 interface RecipeStore {
   recipes: Recipe[];

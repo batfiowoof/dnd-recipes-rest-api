@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
+import { API_BASE_URL } from "@/constants/config";
 
 type Recipe = {
   id: number;
@@ -28,9 +29,7 @@ export const useRecipeDetailStore = create<RecipeDetailState>((set) => ({
   fetchRecipe: async (id) => {
     set({ loading: true, error: null });
     try {
-      const res = await axios.get(
-        `http://192.168.0.213:8080/api/recipes/${id}`
-      );
+      const res = await axios.get(`${API_BASE_URL}/recipes/${id}`);
       set({ recipe: res.data });
     } catch (err) {
       console.error("Error loading recipe", err);

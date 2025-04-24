@@ -3,6 +3,7 @@ import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { Text, Card, ActivityIndicator, FAB } from "react-native-paper";
 import axios from "axios";
 import { useRouter } from "expo-router";
+import { API_BASE_URL } from "@/constants/config";
 import { themeStyles } from "@/constants/themeStyles";
 
 export default function IngredientsScreen() {
@@ -12,7 +13,7 @@ export default function IngredientsScreen() {
 
   useEffect(() => {
     axios
-      .get("http://192.168.0.213:8080/api/ingredients")
+      .get(`${API_BASE_URL}/ingredients`)
       .then((res) => setIngredients(res.data))
       .catch((err) => console.error("Failed to fetch ingredients", err))
       .finally(() => setLoading(false));
